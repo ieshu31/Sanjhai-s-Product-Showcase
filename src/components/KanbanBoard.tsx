@@ -18,7 +18,7 @@ import {
 import { ProductCard, type Product } from "./ProductCard"
 import { Droppable } from "./Droppable"
 
-export type ColumnId = "to-develop" | "in-development" | "done"
+export type ColumnId = "ideas" | "building" | "testing" | "launched"
 
 export interface ProductWithStatus extends Product {
   status: ColumnId
@@ -33,7 +33,8 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "📊",
     revenue: "$12,500/mo",
     labels: ["SaaS", "B2B", "Enterprise"],
-    status: "to-develop",
+    status: "ideas",
+    redirectUrl: "https://analytics-pro.example.com",
   },
   {
     id: "2", 
@@ -43,7 +44,8 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "🎨",
     revenue: "$8,200/mo",
     labels: ["UI/UX", "Components"],
-    status: "in-development",
+    status: "building",
+    redirectUrl: "https://design-system.example.com",
   },
   {
     id: "3",
@@ -53,7 +55,8 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "✅", 
     revenue: "$6,800/mo",
     labels: ["Productivity", "Teams"],
-    status: "done",
+    status: "launched",
+    redirectUrl: "https://task-manager.example.com",
   },
   {
     id: "4",
@@ -63,7 +66,8 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "💻",
     revenue: "$15,300/mo",
     labels: ["Developer Tools", "AI"],
-    status: "to-develop",
+    status: "ideas",
+    redirectUrl: "https://code-editor.example.com",
   },
   {
     id: "5",
@@ -73,7 +77,8 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "🔗",
     revenue: "$22,100/mo",
     labels: ["Infrastructure", "API"],
-    status: "in-development",
+    status: "building",
+    redirectUrl: "https://api-gateway.example.com",
   },
   {
     id: "6",
@@ -83,19 +88,29 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "📧",
     revenue: "$9,600/mo",
     labels: ["Marketing", "Automation"],
-    status: "done",
+    status: "testing",
+    redirectUrl: "https://email-marketing.example.com",
   },
 ]
 
 const columns = [
-  { id: "to-develop" as ColumnId, title: "To Develop" },
-  { id: "in-development" as ColumnId, title: "In Development" },
-  { id: "done" as ColumnId, title: "Done" },
+  { id: "ideas" as ColumnId, title: "Ideas" },
+  { id: "building" as ColumnId, title: "Building" },
+  { id: "testing" as ColumnId, title: "Testing" },
+  { id: "launched" as ColumnId, title: "Launched" },
 ]
 
 export function KanbanBoard() {
   const [products, setProducts] = useState(sampleProducts)
   const [activeProduct, setActiveProduct] = useState<ProductWithStatus | null>(null)
+
+  const handleProductUpdate = (updatedProduct: Product) => {
+    setProducts(prev => prev.map(p => 
+      p.id === updatedProduct.id 
+        ? { ...p, ...updatedProduct }
+        : p
+    ))
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -165,14 +180,6 @@ export function KanbanBoard() {
 
   return (
     <div className="w-full max-w-7xl mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-3 text-foreground">
-          Our Product Portfolio
-        </h2>
-        <p className="text-muted-foreground">
-          Drag products between columns to track development progress
-        </p>
-      </div>
 
       <DndContext
         sensors={sensors}
@@ -181,7 +188,7 @@ export function KanbanBoard() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {columns.map((column) => (
             <div key={column.id} className="flex flex-col">
               <div className="mb-4">
@@ -200,7 +207,11 @@ export function KanbanBoard() {
                     strategy={verticalListSortingStrategy}
                   >
                     {getProductsByStatus(column.id).map((product) => (
-                      <ProductCard key={product.id} product={product} />
+                      <ProductCard 
+                        key={product.id} 
+                        product={product} 
+                        onUpdate={handleProductUpdate}
+                      />
                     ))}
                   </SortableContext>
                 </div>
