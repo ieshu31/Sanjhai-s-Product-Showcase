@@ -18,10 +18,11 @@ import {
 import { ProductCard, type Product } from "./ProductCard"
 import { Droppable } from "./Droppable"
 
-export type ColumnId = "to-develop" | "in-development" | "done"
+export type ColumnId = "ideas" | "building" | "launched"
 
 export interface ProductWithStatus extends Product {
   status: ColumnId
+  redirectUrl?: string
 }
 
 const sampleProducts: ProductWithStatus[] = [
@@ -33,7 +34,8 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "📊",
     revenue: "$12,500/mo",
     labels: ["SaaS", "B2B", "Enterprise"],
-    status: "to-develop",
+    status: "ideas",
+    redirectUrl: "https://example.com/analytics-pro",
   },
   {
     id: "2", 
@@ -43,7 +45,8 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "🎨",
     revenue: "$8,200/mo",
     labels: ["UI/UX", "Components"],
-    status: "in-development",
+    status: "building",
+    redirectUrl: "https://example.com/design-system",
   },
   {
     id: "3",
@@ -53,7 +56,8 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "✅", 
     revenue: "$6,800/mo",
     labels: ["Productivity", "Teams"],
-    status: "done",
+    status: "launched",
+    redirectUrl: "https://example.com/task-manager",
   },
   {
     id: "4",
@@ -63,7 +67,8 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "💻",
     revenue: "$15,300/mo",
     labels: ["Developer Tools", "AI"],
-    status: "to-develop",
+    status: "ideas",
+    redirectUrl: "https://example.com/code-editor",
   },
   {
     id: "5",
@@ -73,7 +78,8 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "🔗",
     revenue: "$22,100/mo",
     labels: ["Infrastructure", "API"],
-    status: "in-development",
+    status: "building",
+    redirectUrl: "https://example.com/api-gateway",
   },
   {
     id: "6",
@@ -83,14 +89,15 @@ const sampleProducts: ProductWithStatus[] = [
     logo: "📧",
     revenue: "$9,600/mo",
     labels: ["Marketing", "Automation"],
-    status: "done",
+    status: "launched",
+    redirectUrl: "https://example.com/email-marketing",
   },
 ]
 
 const columns = [
-  { id: "to-develop" as ColumnId, title: "To Develop" },
-  { id: "in-development" as ColumnId, title: "In Development" },
-  { id: "done" as ColumnId, title: "Done" },
+  { id: "ideas" as ColumnId, title: "Ideas" },
+  { id: "building" as ColumnId, title: "Building" },
+  { id: "launched" as ColumnId, title: "Launched" },
 ]
 
 export function KanbanBoard() {
@@ -163,12 +170,13 @@ export function KanbanBoard() {
     return products.filter((product) => product.status === status)
   }
 
+  function handleProductUpdate(updatedProduct: ProductWithStatus) {
+    setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p))
+  }
+
   return (
     <div className="w-full max-w-7xl mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-3 text-foreground">
-          Our Product Portfolio
-        </h2>
+      <div className="text-center mb-6">
         <p className="text-muted-foreground">
           Drag products between columns to track development progress
         </p>
@@ -200,7 +208,11 @@ export function KanbanBoard() {
                     strategy={verticalListSortingStrategy}
                   >
                     {getProductsByStatus(column.id).map((product) => (
-                      <ProductCard key={product.id} product={product} />
+                      <ProductCard 
+                        key={product.id} 
+                        product={product} 
+                        onProductUpdate={handleProductUpdate}
+                      />
                     ))}
                   </SortableContext>
                 </div>
@@ -211,7 +223,7 @@ export function KanbanBoard() {
 
         <DragOverlay>
           {activeProduct ? (
-            <ProductCard product={activeProduct} />
+            <ProductCard product={activeProduct} onProductUpdate={handleProductUpdate} />
           ) : null}
         </DragOverlay>
       </DndContext>

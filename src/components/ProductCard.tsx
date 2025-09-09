@@ -1,7 +1,12 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { MoreHorizontal, ExternalLink } from "lucide-react"
+import { ProductEditDialog } from "./ProductEditDialog"
+import { ProductWithStatus } from "./KanbanBoard"
+import { useState } from "react"
 
 export interface Product {
   id: string
@@ -11,13 +16,17 @@ export interface Product {
   logo: string
   revenue: string
   labels: string[]
+  redirectUrl?: string
 }
 
 interface ProductCardProps {
-  product: Product
+  product: ProductWithStatus
+  onProductUpdate?: (product: ProductWithStatus) => void
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, onProductUpdate }: ProductCardProps) {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  
   const {
     attributes,
     listeners,
@@ -32,6 +41,22 @@ export function ProductCard({ product }: ProductCardProps) {
     transition,
   }
 
+  const handleProductSave = (updatedProduct: ProductWithStatus) => {
+    onProductUpdate?.(updatedProduct);
+  };
+
+  const handleRedirectClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (product.redirectUrl) {
+      window.open(product.redirectUrl, '_blank');
+    }
+  };
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsEditDialogOpen(true);
+  };
+
   return (
     <Card 
       ref={setNodeRef}
@@ -43,17 +68,43 @@ export function ProductCard({ product }: ProductCardProps) {
       {...listeners}
     >
       <CardContent className="p-4 space-y-3">
-        <div className="flex items-start space-x-3">
-          <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-lg font-medium flex-shrink-0">
-            {product.logo}
+        <div className="flex items-start justify-between">
+          <div className="flex items-start space-x-3 flex-1">
+            <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-lg font-medium flex-shrink-0 overflow-hidden">
+              {product.logo.startsWith('data:') ? (
+                <img src={product.logo} alt="Product" className="w-full h-full object-cover" />
+              ) : (
+                product.logo
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-medium text-card-foreground truncate">
+                {product.name}
+              </h3>
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                {product.description}
+              </p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-card-foreground truncate">
-              {product.name}
-            </h3>
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-              {product.description}
-            </p>
+          <div className="flex items-start space-x-1">
+            {product.redirectUrl && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0"
+                onClick={handleRedirectClick}
+              >
+                <ExternalLink className="h-3 w-3" />
+              </Button>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={handleEditClick}
+            >
+              <MoreHorizontal className="h-3 w-3" />
+            </Button>
           </div>
         </div>
         
@@ -80,6 +131,13 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
       </CardContent>
+      
+      <ProductEditDialog
+        product={product}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onSave={handleProductSave}
+      />
     </Card>
   )
 }
