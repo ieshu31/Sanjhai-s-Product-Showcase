@@ -4,7 +4,7 @@ import { ProfileHeader } from "./ProfileHeader"
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen py-8">
+    <section className="relative min-h-screen py-8 hero-bg-grid">
       <div className="absolute top-8 left-8">
         <ProfileHeader 
           profileImage="/lovable-uploads/d4da20b2-a9af-4864-a0c9-bf7e9ff907f4.png"
