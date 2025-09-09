@@ -22,24 +22,11 @@ export interface Product {
 interface ProductCardProps {
   product: ProductWithStatus
   onProductUpdate?: (product: ProductWithStatus) => void
-  currentColumn: string
-  onStatusChange?: (id: string, newStatus: string) => void
 }
 
-const statusColors: Record<string, string> = {
-  ideas: "bg-blue-50 text-blue-700",
-  building: "bg-yellow-50 text-yellow-700",
-  launched: "bg-green-50 text-green-700"
-};
-
-export function ProductCard({
-  product,
-  onProductUpdate,
-  currentColumn,
-  onStatusChange
-}: ProductCardProps) {
+export function ProductCard({ product, onProductUpdate }: ProductCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-
+  
   const {
     attributes,
     listeners,
@@ -55,44 +42,27 @@ export function ProductCard({
   }
 
   const handleProductSave = (updatedProduct: ProductWithStatus) => {
-    onProductUpdate?.(updatedProduct)
-    setIsEditDialogOpen(false)
-  }
+    onProductUpdate?.(updatedProduct);
+  };
 
   const handleRedirectClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
+    e.stopPropagation();
     if (product.redirectUrl) {
-      window.open(product.redirectUrl, '_blank')
+      window.open(product.redirectUrl, '_blank');
     }
-  }
+  };
 
   const handleEditClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsEditDialogOpen(true)
-  }
-
-  // Label editing logic
-  const [labelEdit, setLabelEdit] = useState(false)
-  const [editedLabel, setEditedLabel] = useState(product.status)
-
-  const handleLabelSave = () => {
-    setLabelEdit(false)
-    if (editedLabel && editedLabel !== product.status && onStatusChange) {
-      onStatusChange(product.id, editedLabel)
-    }
-  }
-
-  // Update label automatically when dragged
-  if (currentColumn !== product.status && onStatusChange) {
-    onStatusChange(product.id, currentColumn)
-  }
+    e.stopPropagation();
+    setIsEditDialogOpen(true);
+  };
 
   return (
-    <Card
+    <Card 
       ref={setNodeRef}
       style={style}
       className={`group hover:shadow-[var(--shadow-card-hover)] transition-all duration-200 border-border bg-card cursor-grab active:cursor-grabbing ${
-        isDragging ? "opacity-50" : ""
+        isDragging ? 'opacity-50' : ''
       }`}
       {...attributes}
       {...listeners}
@@ -101,7 +71,7 @@ export function ProductCard({
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-3 flex-1">
             <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-lg font-medium flex-shrink-0 overflow-hidden">
-              {product.logo.startsWith("data:") ? (
+              {product.logo.startsWith('data:') ? (
                 <img src={product.logo} alt="Product" className="w-full h-full object-cover" />
               ) : (
                 product.logo
@@ -137,57 +107,37 @@ export function ProductCard({
             </Button>
           </div>
         </div>
-        <div className="flex items-center space-x-2">
-          {labelEdit ? (
-            <>
-              <select
-                value={editedLabel}
-                onChange={(e) => setEditedLabel(e.target.value)}
-                className="rounded px-2 py-1 border border-gray-200 text-sm"
-              >
-                <option value="ideas">Ideas</option>
-                <option value="building">Building</option>
-                <option value="launched">Launched</option>
-              </select>
-              <Button
-                variant="outline"
-                size="xs"
-                onClick={handleLabelSave}
-                className="px-2 py-1"
-              >
-                Save
-              </Button>
-            </>
-          ) : (
-            <>
-              <span
-                className={`px-2 py-1 rounded text-xs font-medium cursor-pointer ${statusColors[product.status]}`}
-                onClick={() => setLabelEdit(true)}
-                title="Edit section label"
-              >
-                {product.status.charAt(0).toUpperCase() + product.status.slice(1)}
-              </span>
-              <Button
-                variant="ghost"
-                size="xs"
-                className="p-1"
-                onClick={() => setLabelEdit(true)}
-                aria-label="Edit section label"
-              >
-                <MoreHorizontal className="h-3 w-3" />
-              </Button>
-            </>
-          )}
+        
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-semibold text-foreground">
+            {product.revenue}
+          </span>
+          <Badge variant="secondary" className="text-xs">
+            {product.category}
+          </Badge>
         </div>
+
+        {product.labels.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {product.labels.map((label, index) => (
+              <Badge 
+                key={index} 
+                variant="outline" 
+                className="text-xs px-2 py-0.5"
+              >
+                {label}
+              </Badge>
+            ))}
+          </div>
+        )}
       </CardContent>
-      {isEditDialogOpen && (
-        <ProductEditDialog
-          open={isEditDialogOpen}
-          product={product}
-          onClose={() => setIsEditDialogOpen(false)}
-          onSave={handleProductSave}
-        />
-      )}
+      
+      <ProductEditDialog
+        product={product}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onSave={handleProductSave}
+      />
     </Card>
-  );
+  )
 }
