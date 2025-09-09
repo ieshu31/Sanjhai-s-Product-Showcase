@@ -15,7 +15,6 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Rethink Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        handwritten: ['Dancing Script', 'cursive'],
       },
       colors: {
         border: "hsl(var(--border))",
