@@ -21,7 +21,7 @@ export function Hero() {
             Building the Future
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-8">
-            Discover our collection of innovative tools and products designed to help you achieve more.
+            Discover my collection of innovative tools and products designed to help you achieve more.
           </p>
         </div>
         
