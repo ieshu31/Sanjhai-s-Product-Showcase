@@ -6,10 +6,7 @@ export function Hero() {
   return (
     <section className="relative min-h-screen py-8 hero-bg-grid">
       <div className="absolute top-8 left-8">
-        <ProfileHeader 
-          profileImage="/lovable-uploads/d4da20b2-a9af-4864-a0c9-bf7e9ff907f4.png"
-          name="Sanjhai Prakash"
-        />
+        <ProfileHeader name="Sanjhai Prakash" />
       </div>
       <div className="absolute top-8 right-8">
         <ThemeToggle />

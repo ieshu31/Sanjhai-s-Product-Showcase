@@ -16,6 +16,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { ProductCard, type Product } from "./ProductCard"
+import { Button } from "@/components/ui/button"
 import { Droppable } from "./Droppable"
 
 export type ColumnId = "ideas" | "building" | "launched"
@@ -174,6 +175,25 @@ export function KanbanBoard() {
     setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p))
   }
 
+  function handleAddProduct(status: ColumnId) {
+    const newProduct: ProductWithStatus = {
+      id: Date.now().toString(),
+      name: "New Product",
+      description: "Add your product description",
+      category: "Category",
+      logo: "📦",
+      revenue: "$0/mo",
+      labels: [],
+      status,
+      redirectUrl: "",
+    }
+    setProducts([...products, newProduct])
+  }
+
+  function handleDeleteProduct(productId: string) {
+    setProducts(products.filter(p => p.id !== productId))
+  }
+
   return (
     <div className="w-full max-w-7xl mx-auto">
       <div className="text-center mb-6">
@@ -189,36 +209,49 @@ export function KanbanBoard() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {columns.map((column) => (
-            <div key={column.id} className="flex flex-col">
-              <div className="mb-4">
-                <h3 className="font-semibold text-lg text-foreground mb-1">
-                  {column.title}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {getProductsByStatus(column.id).length} products
-                </p>
-              </div>
-              
-              <Droppable id={column.id}>
-                <div className="flex-1 space-y-3 min-h-[400px] p-4 rounded-lg border border-dashed border-border bg-muted/30">
-                  <SortableContext 
-                    items={getProductsByStatus(column.id)} 
-                    strategy={verticalListSortingStrategy}
+        <div className="p-6 rounded-lg border-2 border-border/50 bg-card/30">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {columns.map((column) => (
+              <div key={column.id} className="flex flex-col">
+                <div className="mb-4 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-lg text-foreground mb-1">
+                      {column.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {getProductsByStatus(column.id).length} products
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    onClick={() => handleAddProduct(column.id)}
                   >
-                    {getProductsByStatus(column.id).map((product) => (
-                      <ProductCard 
-                        key={product.id} 
-                        product={product} 
-                        onProductUpdate={handleProductUpdate}
-                      />
-                    ))}
-                  </SortableContext>
+                    +
+                  </Button>
                 </div>
-              </Droppable>
-            </div>
-          ))}
+                
+                <Droppable id={column.id}>
+                  <div className="flex-1 space-y-3 min-h-[400px] p-4 rounded-lg border border-dashed border-border bg-muted/30">
+                    <SortableContext 
+                      items={getProductsByStatus(column.id)} 
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {getProductsByStatus(column.id).map((product) => (
+                        <ProductCard 
+                          key={product.id} 
+                          product={product} 
+                          onProductUpdate={handleProductUpdate}
+                          onProductDelete={handleDeleteProduct}
+                        />
+                      ))}
+                    </SortableContext>
+                  </div>
+                </Droppable>
+              </div>
+            ))}
+          </div>
         </div>
 
         <DragOverlay>

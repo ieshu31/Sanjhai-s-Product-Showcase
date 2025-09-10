@@ -3,7 +3,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { MoreHorizontal, ExternalLink } from "lucide-react"
+import { MoreHorizontal, ExternalLink, Trash2 } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ProductEditDialog } from "./ProductEditDialog"
 import { ProductWithStatus } from "./KanbanBoard"
 import { useState } from "react"
@@ -22,9 +23,10 @@ export interface Product {
 interface ProductCardProps {
   product: ProductWithStatus
   onProductUpdate?: (product: ProductWithStatus) => void
+  onProductDelete?: (productId: string) => void
 }
 
-export function ProductCard({ product, onProductUpdate }: ProductCardProps) {
+export function ProductCard({ product, onProductUpdate, onProductDelete }: ProductCardProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   
   const {
@@ -55,6 +57,11 @@ export function ProductCard({ product, onProductUpdate }: ProductCardProps) {
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsEditDialogOpen(true);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onProductDelete?.(product.id);
   };
 
   return (
@@ -97,14 +104,27 @@ export function ProductCard({ product, onProductUpdate }: ProductCardProps) {
                 <ExternalLink className="h-3 w-3" />
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={handleEditClick}
-            >
-              <MoreHorizontal className="h-3 w-3" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreHorizontal className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleEditClick}>
+                  Edit Product
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDeleteClick} className="text-destructive">
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Product
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
         

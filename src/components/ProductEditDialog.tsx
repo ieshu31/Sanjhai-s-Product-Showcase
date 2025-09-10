@@ -60,6 +60,46 @@ export function ProductEditDialog({ product, open, onOpenChange, onSave }: Produ
         
         <div className="space-y-4">
           <div className="space-y-2">
+            <Label htmlFor="name">Product Name</Label>
+            <Input
+              id="name"
+              value={editedProduct.name}
+              onChange={(e) => setEditedProduct({ ...editedProduct, name: e.target.value })}
+              placeholder="Enter product name"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Input
+              id="description"
+              value={editedProduct.description}
+              onChange={(e) => setEditedProduct({ ...editedProduct, description: e.target.value })}
+              placeholder="Enter product description"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Input
+              id="category"
+              value={editedProduct.category}
+              onChange={(e) => setEditedProduct({ ...editedProduct, category: e.target.value })}
+              placeholder="Enter category"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="revenue">Revenue</Label>
+            <Input
+              id="revenue"
+              value={editedProduct.revenue}
+              onChange={(e) => setEditedProduct({ ...editedProduct, revenue: e.target.value })}
+              placeholder="$0/mo"
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="image">Product Image</Label>
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 rounded-lg bg-accent flex items-center justify-center text-lg overflow-hidden">
