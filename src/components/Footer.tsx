@@ -2,10 +2,10 @@ import { ExternalLink } from "lucide-react"
 
 export function Footer() {
   const socialLinks = [
-    { name: "LinkedIn", url: "https://linkedin.com", iconSrc: "/LinkedIn Icon.svg" },
-    { name: "Instagram", url: "https://instagram.com", iconSrc: "/Instagram Icon.svg" },
-    { name: "Reddit", url: "https://reddit.com", iconSrc: "/Reddit Icon.svg" },
-    { name: "X", url: "https://x.com", iconSrc: "/X Icon.svg" },
+    { name: "LinkedIn", url: "https://www.linkedin.com/in/sanjhaiprakash/", iconSrc: "/LinkedIn Icon.svg" },
+    { name: "Instagram", url: "https://www.instagram.com/sanjhai_18/", iconSrc: "/Instagram Icon.svg" },
+    { name: "Reddit", url: "https://www.reddit.com/user/Appropriate-Look-875/", iconSrc: "/Reddit Icon.svg" },
+    { name: "X", url: "https://x.com/Sanjhai_18", iconSrc: "/X Icon.svg" },
   ]
 
   return (
@@ -19,15 +19,14 @@ export function Footer() {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors"
+                className="flex items-center text-muted-foreground hover:text-foreground transition-colors"
               >
                 <img
                   src={link.iconSrc}
                   alt={`${link.name} icon`}
                   className="h-5 w-5"
                 />
-                <span className="text-sm">{link.name}</span>
-                <ExternalLink className="h-3 w-3" />
+                <ExternalLink className="h-3 w-3 ml-2" />
               </a>
             ))}
           </div>
