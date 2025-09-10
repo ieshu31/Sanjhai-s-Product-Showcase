@@ -31,7 +31,7 @@ const sampleProducts: ProductWithStatus[] = [
     id: "1",
     name: "Analytics Pro",
     description: "Advanced analytics platform with real-time insights and custom dashboards",
-    category: "Analytics",
+    section: "Ideas",
     logo: "📊",
     revenue: "$12,500/mo",
     labels: ["SaaS", "B2B", "Enterprise"],
@@ -42,7 +42,7 @@ const sampleProducts: ProductWithStatus[] = [
     id: "2", 
     name: "Design System",
     description: "Complete design system with components, tokens, and documentation",
-    category: "Design",
+    section: "Building",
     logo: "🎨",
     revenue: "$8,200/mo",
     labels: ["UI/UX", "Components"],
@@ -53,7 +53,7 @@ const sampleProducts: ProductWithStatus[] = [
     id: "3",
     name: "Task Manager",
     description: "Intuitive project management tool for teams of all sizes",
-    category: "Productivity",
+    section: "Launched",
     logo: "✅", 
     revenue: "$6,800/mo",
     labels: ["Productivity", "Teams"],
@@ -64,7 +64,7 @@ const sampleProducts: ProductWithStatus[] = [
     id: "4",
     name: "Code Editor",
     description: "Modern code editor with AI assistance and collaborative features",
-    category: "Development",
+    section: "Ideas",
     logo: "💻",
     revenue: "$15,300/mo",
     labels: ["Developer Tools", "AI"],
@@ -75,7 +75,7 @@ const sampleProducts: ProductWithStatus[] = [
     id: "5",
     name: "API Gateway",
     description: "Secure and scalable API management platform for modern applications",
-    category: "Development", 
+    section: "Building", 
     logo: "🔗",
     revenue: "$22,100/mo",
     labels: ["Infrastructure", "API"],
@@ -86,7 +86,7 @@ const sampleProducts: ProductWithStatus[] = [
     id: "6",
     name: "Email Marketing",
     description: "Email marketing automation with advanced segmentation and analytics",
-    category: "Marketing",
+    section: "Launched",
     logo: "📧",
     revenue: "$9,600/mo",
     labels: ["Marketing", "Automation"],
@@ -143,6 +143,7 @@ export function KanbanBoard() {
 
         if (products[activeIndex].status !== products[overIndex].status) {
           products[activeIndex].status = products[overIndex].status
+          products[activeIndex].section = products[overIndex].status.charAt(0).toUpperCase() + products[overIndex].status.slice(1)
         }
 
         return arrayMove(products, activeIndex, overIndex)
@@ -156,6 +157,7 @@ export function KanbanBoard() {
         
         if (products[activeIndex].status !== overId) {
           products[activeIndex].status = overId as ColumnId
+          products[activeIndex].section = (overId as string).charAt(0).toUpperCase() + (overId as string).slice(1)
         }
 
         return [...products]
@@ -180,7 +182,7 @@ export function KanbanBoard() {
       id: Date.now().toString(),
       name: "New Product",
       description: "Add your product description",
-      category: "Category",
+      section: status.charAt(0).toUpperCase() + status.slice(1),
       logo: "📦",
       revenue: "$0/mo",
       labels: [],
@@ -209,7 +211,7 @@ export function KanbanBoard() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="p-6 rounded-lg border-2 border-border/50 bg-card/30">
+        <div className="p-6 rounded-lg border border-border bg-card/30">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {columns.map((column) => (
               <div key={column.id} className="flex flex-col">

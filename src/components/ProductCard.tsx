@@ -13,7 +13,7 @@ export interface Product {
   id: string
   name: string
   description: string
-  category: string
+  section: string
   logo: string
   revenue: string
   labels: string[]
@@ -133,7 +133,7 @@ export function ProductCard({ product, onProductUpdate, onProductDelete }: Produ
             {product.revenue}
           </span>
           <Badge variant="secondary" className="text-xs">
-            {product.category}
+            {product.section}
           </Badge>
         </div>
 

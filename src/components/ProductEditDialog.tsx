@@ -80,12 +80,12 @@ export function ProductEditDialog({ product, open, onOpenChange, onSave }: Produ
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="section">Section</Label>
             <Input
-              id="category"
-              value={editedProduct.category}
-              onChange={(e) => setEditedProduct({ ...editedProduct, category: e.target.value })}
-              placeholder="Enter category"
+              id="section"
+              value={editedProduct.section}
+              onChange={(e) => setEditedProduct({ ...editedProduct, section: e.target.value })}
+              placeholder="Enter section"
             />
           </div>
 
