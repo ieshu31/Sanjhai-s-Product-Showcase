@@ -1,5 +1,3 @@
-import { ExternalLink } from "lucide-react"
-
 export function Footer() {
   const socialLinks = [
     { name: "LinkedIn", url: "https://www.linkedin.com/in/sanjhaiprakash/", iconSrc: "/LinkedIn Icon.svg" },
@@ -24,7 +22,7 @@ export function Footer() {
                 <img
                   src={link.iconSrc}
                   alt={`${link.name} icon`}
-                  className="h-5 w-5"
+                  className="h-5 w-5 filter dark:invert"
                 />
               </a>
             ))}
