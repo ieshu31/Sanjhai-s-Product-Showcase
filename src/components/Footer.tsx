@@ -2,10 +2,10 @@ import { ExternalLink } from "lucide-react"
 
 export function Footer() {
   const socialLinks = [
-    { name: "LinkedIn", url: "https://linkedin.com", icon: "🔗" },
-    { name: "Instagram", url: "https://instagram.com", icon: "📷" },
-    { name: "Reddit", url: "https://reddit.com", icon: "🤖" },
-    { name: "X", url: "https://x.com", icon: "❌" },
+    { name: "LinkedIn", url: "https://linkedin.com", iconSrc: "/LinkedIn Icon.svg" },
+    { name: "Instagram", url: "https://instagram.com", iconSrc: "/Instagram Icon.svg" },
+    { name: "Reddit", url: "https://reddit.com", iconSrc: "/Reddit Icon.svg" },
+    { name: "X", url: "https://x.com", iconSrc: "/X Icon.svg" },
   ]
 
   return (
@@ -21,7 +21,11 @@ export function Footer() {
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors"
               >
-                <span className="text-lg">{link.icon}</span>
+                <img
+                  src={link.iconSrc}
+                  alt={`${link.name} icon`}
+                  className="h-5 w-5"
+                />
                 <span className="text-sm">{link.name}</span>
                 <ExternalLink className="h-3 w-3" />
               </a>
