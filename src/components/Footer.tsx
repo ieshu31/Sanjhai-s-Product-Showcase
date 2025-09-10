@@ -26,7 +26,6 @@ export function Footer() {
                   alt={`${link.name} icon`}
                   className="h-5 w-5"
                 />
-                <ExternalLink className="h-3 w-3 ml-2" />
               </a>
             ))}
           </div>
