@@ -3,10 +3,11 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { MoreHorizontal, ExternalLink, Trash2 } from "lucide-react"
+import { MoreHorizontal, ExternalLink, Trash2, ChevronDown } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ProductEditDialog } from "./ProductEditDialog"
-import { ProductWithStatus } from "./KanbanBoard"
+import { ProductWithStatus, ColumnId } from "./KanbanBoard"
 import { useState } from "react"
 
 export interface Product {
@@ -24,6 +25,25 @@ interface ProductCardProps {
   product: ProductWithStatus
   onProductUpdate?: (product: ProductWithStatus) => void
   onProductDelete?: (productId: string) => void
+}
+
+const sections = [
+  { value: "ideas", label: "Ideas" },
+  { value: "building", label: "Building" },
+  { value: "launched", label: "Launched" }
+]
+
+const getSectionColor = (section: string) => {
+  switch (section.toLowerCase()) {
+    case "ideas":
+      return "bg-[hsl(var(--section-ideas))] text-[hsl(var(--section-ideas))]"
+    case "building":
+      return "bg-[hsl(var(--section-building))] text-[hsl(var(--section-building))]"
+    case "launched":
+      return "bg-[hsl(var(--section-launched))] text-[hsl(var(--section-launched))]"
+    default:
+      return "bg-secondary text-secondary-foreground"
+  }
 }
 
 export function ProductCard({ product, onProductUpdate, onProductDelete }: ProductCardProps) {
@@ -62,6 +82,15 @@ export function ProductCard({ product, onProductUpdate, onProductDelete }: Produ
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onProductDelete?.(product.id);
+  };
+
+  const handleSectionChange = (newSection: string) => {
+    const updatedProduct = {
+      ...product,
+      section: newSection,
+      status: newSection.toLowerCase() as ColumnId
+    };
+    onProductUpdate?.(updatedProduct);
   };
 
   return (
@@ -132,9 +161,23 @@ export function ProductCard({ product, onProductUpdate, onProductDelete }: Produ
           <span className="text-sm font-semibold text-foreground">
             {product.revenue}
           </span>
-          <Badge variant="secondary" className="text-xs">
-            {product.section}
-          </Badge>
+          <Select value={product.section} onValueChange={handleSectionChange}>
+            <SelectTrigger 
+              className={`w-auto h-6 text-xs border-0 ${getSectionColor(product.section)} hover:opacity-80 transition-opacity`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {sections.map((section) => (
+                <SelectItem key={section.value} value={section.label}>
+                  <span className={`px-2 py-1 rounded text-xs ${getSectionColor(section.label)}`}>
+                    {section.label}
+                  </span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {product.labels.length > 0 && (

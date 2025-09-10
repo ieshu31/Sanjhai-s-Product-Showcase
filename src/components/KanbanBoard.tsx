@@ -211,7 +211,7 @@ export function KanbanBoard() {
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="p-6 rounded-lg border border-border bg-card/30">
+        <div className="p-6 rounded-lg border border-border bg-card">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {columns.map((column) => (
               <div key={column.id} className="flex flex-col">
