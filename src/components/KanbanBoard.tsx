@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   DndContext,
   DragEndEvent,
@@ -18,6 +18,8 @@ import {
 import { ProductCard, type Product } from "./ProductCard"
 import { Button } from "@/components/ui/button"
 import { Droppable } from "./Droppable"
+import { supabase } from "@/integrations/supabase/client"
+import { useToast } from "@/hooks/use-toast"
 
 export type ColumnId = "ideas" | "building" | "launched"
 
@@ -26,75 +28,6 @@ export interface ProductWithStatus extends Product {
   redirectUrl?: string
 }
 
-const sampleProducts: ProductWithStatus[] = [
-  {
-    id: "1",
-    name: "Analytics Pro",
-    description: "Advanced analytics platform with real-time insights and custom dashboards",
-    section: "Ideas",
-    logo: "📊",
-    revenue: "$12,500/mo",
-    labels: ["SaaS", "B2B", "Enterprise"],
-    status: "ideas",
-    redirectUrl: "https://example.com/analytics-pro",
-  },
-  {
-    id: "2", 
-    name: "Design System",
-    description: "Complete design system with components, tokens, and documentation",
-    section: "Building",
-    logo: "🎨",
-    revenue: "$8,200/mo",
-    labels: ["UI/UX", "Components"],
-    status: "building",
-    redirectUrl: "https://example.com/design-system",
-  },
-  {
-    id: "3",
-    name: "Task Manager",
-    description: "Intuitive project management tool for teams of all sizes",
-    section: "Launched",
-    logo: "✅", 
-    revenue: "$6,800/mo",
-    labels: ["Productivity", "Teams"],
-    status: "launched",
-    redirectUrl: "https://example.com/task-manager",
-  },
-  {
-    id: "4",
-    name: "Code Editor",
-    description: "Modern code editor with AI assistance and collaborative features",
-    section: "Ideas",
-    logo: "💻",
-    revenue: "$15,300/mo",
-    labels: ["Developer Tools", "AI"],
-    status: "ideas",
-    redirectUrl: "https://example.com/code-editor",
-  },
-  {
-    id: "5",
-    name: "API Gateway",
-    description: "Secure and scalable API management platform for modern applications",
-    section: "Building", 
-    logo: "🔗",
-    revenue: "$22,100/mo",
-    labels: ["Infrastructure", "API"],
-    status: "building",
-    redirectUrl: "https://example.com/api-gateway",
-  },
-  {
-    id: "6",
-    name: "Email Marketing",
-    description: "Email marketing automation with advanced segmentation and analytics",
-    section: "Launched",
-    logo: "📧",
-    revenue: "$9,600/mo",
-    labels: ["Marketing", "Automation"],
-    status: "launched",
-    redirectUrl: "https://example.com/email-marketing",
-  },
-]
-
 const columns = [
   { id: "ideas" as ColumnId, title: "Ideas" },
   { id: "building" as ColumnId, title: "Building" },
@@ -102,8 +35,10 @@ const columns = [
 ]
 
 export function KanbanBoard() {
-  const [products, setProducts] = useState(sampleProducts)
+  const [products, setProducts] = useState<ProductWithStatus[]>([])
   const [activeProduct, setActiveProduct] = useState<ProductWithStatus | null>(null)
+  const [loading, setLoading] = useState(true)
+  const { toast } = useToast()
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -112,6 +47,46 @@ export function KanbanBoard() {
       },
     })
   )
+
+  // Load products from Supabase
+  useEffect(() => {
+    loadProducts()
+  }, [])
+
+  const loadProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('position', { ascending: true })
+
+      if (error) throw error
+
+      const formattedProducts: ProductWithStatus[] = data.map(product => ({
+        id: product.id,
+        name: product.name,
+        description: product.description || '',
+        section: product.status === 'ideas' ? 'Ideas' : 
+                 product.status === 'building' ? 'Building' : 'Launched',
+        logo: product.logo || '📦',
+        revenue: product.revenue || '$0',
+        labels: product.labels || [],
+        redirectUrl: product.redirect_url,
+        status: product.status as ColumnId
+      }))
+
+      setProducts(formattedProducts)
+    } catch (error) {
+      console.error('Error loading products:', error)
+      toast({
+        title: "Error",
+        description: "Failed to load products. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   function handleDragStart(event: DragStartEvent) {
     const { active } = event
@@ -144,6 +119,15 @@ export function KanbanBoard() {
         if (products[activeIndex].status !== products[overIndex].status) {
           products[activeIndex].status = products[overIndex].status
           products[activeIndex].section = products[overIndex].status.charAt(0).toUpperCase() + products[overIndex].status.slice(1)
+          
+          // Update in database
+          supabase
+            .from('products')
+            .update({ status: products[activeIndex].status })
+            .eq('id', activeId.toString())
+            .then(({ error }) => {
+              if (error) console.error('Error updating product status:', error)
+            })
         }
 
         return arrayMove(products, activeIndex, overIndex)
@@ -158,6 +142,15 @@ export function KanbanBoard() {
         if (products[activeIndex].status !== overId) {
           products[activeIndex].status = overId as ColumnId
           products[activeIndex].section = (overId as string).charAt(0).toUpperCase() + (overId as string).slice(1)
+          
+          // Update in database
+          supabase
+            .from('products')
+            .update({ status: overId.toString() })
+            .eq('id', activeId.toString())
+            .then(({ error }) => {
+              if (error) console.error('Error updating product status:', error)
+            })
         }
 
         return [...products]
@@ -173,27 +166,131 @@ export function KanbanBoard() {
     return products.filter((product) => product.status === status)
   }
 
-  function handleProductUpdate(updatedProduct: ProductWithStatus) {
-    setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p))
-  }
+  const handleProductUpdate = async (updatedProduct: ProductWithStatus) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .update({
+          name: updatedProduct.name,
+          description: updatedProduct.description,
+          status: updatedProduct.status,
+          logo: updatedProduct.logo,
+          revenue: updatedProduct.revenue,
+          labels: updatedProduct.labels,
+          redirect_url: updatedProduct.redirectUrl
+        })
+        .eq('id', updatedProduct.id)
 
-  function handleAddProduct(status: ColumnId) {
-    const newProduct: ProductWithStatus = {
-      id: Date.now().toString(),
-      name: "New Product",
-      description: "Add your product description",
-      section: status.charAt(0).toUpperCase() + status.slice(1),
-      logo: "📦",
-      revenue: "$0/mo",
-      labels: [],
-      status,
-      redirectUrl: "",
+      if (error) throw error
+
+      setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p))
+      
+      toast({
+        title: "Success",
+        description: "Product updated successfully."
+      })
+    } catch (error) {
+      console.error('Error updating product:', error)
+      toast({
+        title: "Error",
+        description: "Failed to update product. Please try again.",
+        variant: "destructive"
+      })
     }
-    setProducts([...products, newProduct])
   }
 
-  function handleDeleteProduct(productId: string) {
-    setProducts(products.filter(p => p.id !== productId))
+  const handleAddProduct = async (status: ColumnId) => {
+    try {
+      const { data: userData, error: userError } = await supabase.auth.getUser()
+      
+      if (userError || !userData.user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to add products.",
+          variant: "destructive"
+        })
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('products')
+        .insert({
+          user_id: userData.user.id,
+          name: "New Product",
+          description: "Add your product description",
+          status: status,
+          logo: "📦",
+          revenue: "$0/mo",
+          labels: [],
+          position: products.length
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+
+      const newProduct: ProductWithStatus = {
+        id: data.id,
+        name: data.name,
+        description: data.description || '',
+        section: status.charAt(0).toUpperCase() + status.slice(1),
+        logo: data.logo || '📦',
+        revenue: data.revenue || '$0',
+        labels: data.labels || [],
+        redirectUrl: data.redirect_url,
+        status: data.status as ColumnId
+      }
+
+      setProducts([...products, newProduct])
+      
+      toast({
+        title: "Success",
+        description: "New product added successfully."
+      })
+    } catch (error) {
+      console.error('Error adding product:', error)
+      toast({
+        title: "Error",
+        description: "Failed to add product. Please try again.",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId)
+
+      if (error) throw error
+
+      setProducts(products.filter(p => p.id !== productId))
+      
+      toast({
+        title: "Success",
+        description: "Product deleted successfully."
+      })
+    } catch (error) {
+      console.error('Error deleting product:', error)
+      toast({
+        title: "Error",
+        description: "Failed to delete product. Please try again.",
+        variant: "destructive"
+      })
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="w-full max-w-7xl mx-auto p-6 flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading products...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
