@@ -104,6 +104,13 @@ export function ProductCard({ product, onProductUpdate, onProductDelete }: Produ
       {...listeners}
     >
       <CardContent className="p-4 space-y-3">
+        <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-2 ${
+          product.section.toLowerCase() === 'ideas' ? 'bg-[hsl(var(--section-ideas))] text-orange-800' :
+          product.section.toLowerCase() === 'building' ? 'bg-[hsl(var(--section-building))] text-yellow-800' :
+          'bg-[hsl(var(--section-launched))] text-green-800'
+        }`}>
+          {product.section}
+        </div>
         <div className="flex items-start justify-between">
           <div className="flex items-start space-x-3 flex-1">
             <div className="w-10 h-10 rounded-lg bg-accent flex items-center justify-center text-lg font-medium flex-shrink-0 overflow-hidden">
