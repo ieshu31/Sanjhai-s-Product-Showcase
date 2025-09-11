@@ -114,6 +114,23 @@ All colors MUST be HSL.
   }
 }
 
+.cursor-mac {
+  cursor: url('/lovable-uploads/34db388c-7580-4b16-9a51-8494ec123065.png') 16 16, auto;
+}
+
+.cursor-mac::after {
+  content: "You";
+  position: fixed;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(20px, -30px);
+}
+
 .bg-grid-pattern {
   background-image: 
     radial-gradient(circle at 1px 1px, hsl(var(--muted-foreground) / 0.15) 1px, transparent 0);

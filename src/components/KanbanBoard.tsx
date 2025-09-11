@@ -217,9 +217,13 @@ export function KanbanBoard() {
               <div key={column.id} className="flex flex-col">
                 <div className="mb-4 flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-lg text-foreground mb-1">
+                    <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-2 ${
+                      column.id === 'ideas' ? 'bg-ideas text-ideas-foreground' :
+                      column.id === 'building' ? 'bg-building text-building-foreground' :
+                      'bg-launched text-launched-foreground'
+                    }`}>
                       {column.title}
-                    </h3>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       {getProductsByStatus(column.id).length} products
                     </p>

@@ -80,7 +80,7 @@ export function ProductEditDialog({ product, open, onOpenChange, onSave }: Produ
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="section">Section</Label>
+            <Label htmlFor="section">Status</Label>
             <Input
               id="section"
               value={editedProduct.section}
