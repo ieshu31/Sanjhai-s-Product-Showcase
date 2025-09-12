@@ -1,17 +1,15 @@
-import { ThemeToggle } from "./ThemeToggle"
 import { KanbanBoard } from "./KanbanBoard"
 import { ProfileHeader } from "./ProfileHeader"
 import { Footer } from "./Footer"
+import { AuthButton } from "./AuthButton"
 
 export function Hero() {
   return (
     <div>
       <section className="relative min-h-screen py-8 bg-background bg-grid-pattern">
-        <div className="absolute top-8 left-8">
+        <div className="flex items-center justify-between w-full px-8">
           <ProfileHeader name="Sanjhai Prakash" />
-        </div>
-        <div className="absolute top-8 right-8">
-          <ThemeToggle />
+          <AuthButton />
         </div>
         
         <div className="container mx-auto px-4">
